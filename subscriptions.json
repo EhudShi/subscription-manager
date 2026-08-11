@@ -11,9 +11,9 @@
     "id": "seed-2",
     "name": "Netflix",
     "category": "תוכן ובידור",
-    "cost": 420,
-    "cycle": "annual",
-    "renewalDate": "2026-08-13"
+    "cost": 35,
+    "cycle": "monthly",
+    "renewalDate": "2026-09-01"
   },
   {
     "id": "seed-3",
