@@ -35,8 +35,8 @@
     "id": "seed-5",
     "name": "Spotify",
     "category": "תוכן ובידור",
-    "cost": 407,
-    "cycle": "annual",
+    "cost": 13,
+    "cycle": "monthly",
     "renewalDate": "2026-08-13"
   },
   {
