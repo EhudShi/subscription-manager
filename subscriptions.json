@@ -51,9 +51,9 @@
     "id": "seed-7",
     "name": "Wolt+",
     "category": "מזון ומשלוחים",
-    "cost": 600,
-    "cycle": "annual",
-    "renewalDate": "2026-08-10"
+    "cost": 50,
+    "cycle": "monthly",
+    "renewalDate": "2026-08-20"
   },
   {
     "id": "seed-8",
