@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>פנקס מנויים</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Mono:wght@500;600&family=Heebo:wght@300;400;500;600&display=swap');
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    --paper: #EAE4D6;
+    --paper-card: #F6F2E7;
+    --ink: #2B2620;
+    --ink-soft: #6B6455;
+    --line: #C9C0AC;
+    --red: #B23A2E;
+    --green: #2F5233;
+    font-family: 'Heebo', sans-serif;
+    background: var(--paper);
+    background-image: radial-gradient(circle at 1px 1px, rgba(43,38,32,0.06) 1px, transparent 0);
+    background-size: 18px 18px;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 20px 16px 60px;
+  }
+
+  .lg-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; gap: 10px; }
+  .lg-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+  }
+  .lg-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 28px;
+    margin: 4px 0 0;
+    line-height: 1.15;
+  }
+  .lg-gear {
+    background: var(--paper-card);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .lg-sync-bar {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .lg-sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+  .lg-sync-dot.err { background: var(--red); }
+  .lg-sync-dot.busy { background: #A6873E; }
+
+  .lg-totals {
+    background: var(--paper-card);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+  }
+  .lg-totals-row { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; }
+  .lg-totals-row + .lg-totals-row { border-top: 1px dashed var(--line); }
+  .lg-totals-label { font-size: 13px; color: var(--ink-soft); }
+  .lg-totals-value { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 22px; }
+  .lg-totals-value.small { font-size: 17px; }
+
+  .lg-upcoming {
+    background: #F1E4DD;
+    border: 1px solid #D8AFA0;
+    border-radius: 4px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    display: none;
+  }
+  .lg-upcoming.show { display: block; }
+  .lg-upcoming-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--red);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  .lg-upcoming-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; }
+  .lg-upcoming-item + .lg-upcoming-item { border-top: 1px solid rgba(178,58,46,0.15); }
+  .lg-upcoming-name { font-weight: 500; font-size: 14px; }
+  .lg-upcoming-sub { font-size: 12px; color: var(--ink-soft); }
+  .lg-upcoming-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .lg-btn-tiny {
+    font-family: 'Heebo', sans-serif;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 3px;
+    border: 1px solid var(--line);
+    background: var(--paper-card);
+    cursor: pointer;
+  }
+  .lg-btn-tiny.yes { border-color: var(--green); color: var(--green); }
+  .lg-btn-tiny.no { border-color: var(--red); color: var(--red); }
+
+  .lg-cats { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .lg-cat-chip {
+    display: flex; align-items: center; gap: 6px; font-size: 12px;
+    background: var(--paper-card); border: 1px solid var(--line); border-radius: 20px; padding: 5px 10px;
+  }
+  .lg-cat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .lg-cat-amount { font-family: 'IBM Plex Mono', monospace; color: var(--ink-soft); }
+
+  .lg-list-title {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--ink-soft); margin: 0 0 10px;
+  }
+
+  .ticket {
+    position: relative; display: flex; background: var(--paper-card);
+    border: 1px solid var(--line); border-radius: 6px; margin-bottom: 14px; overflow: hidden;
+  }
+  .ticket-main { flex: 1; padding: 14px 16px 14px 34px; min-width: 0; }
+  .ticket-name { font-family: 'Fraunces', serif; font-weight: 600; font-size: 17px; margin: 0 0 4px; }
+  .ticket-meta { font-size: 12px; color: var(--ink-soft); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .ticket-stamp { font-size: 10px; padding: 2px 7px; border-radius: 20px; color: #fff; font-weight: 600; }
+  .ticket-divider { position: relative; width: 0; border-right: 1px dashed var(--line); }
+  .ticket-divider::before, .ticket-divider::after {
+    content: ''; position: absolute; width: 14px; height: 14px; background: var(--paper); border-radius: 50%; right: -7px;
+  }
+  .ticket-divider::before { top: -7px; }
+  .ticket-divider::after { bottom: -7px; }
+  .ticket-side {
+    width: 118px; flex-shrink: 0; padding: 14px 12px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+  }
+  .ticket-price { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 16px; }
+  .ticket-cycle { font-size: 10px; color: var(--ink-soft); margin-top: 2px; }
+  .ticket-days { font-size: 11px; margin-top: 8px; color: var(--ink-soft); }
+  .ticket-days.soon { color: var(--red); font-weight: 600; }
+  .ticket-actions { position: absolute; top: 6px; left: 6px; display: flex; flex-direction: column; gap: 2px; }
+  .ticket-edit, .ticket-del {
+    background: none; border: none; color: var(--ink-soft); cursor: pointer;
+    font-size: 14px; line-height: 1; padding: 5px 6px; border-radius: 3px;
+  }
+  .ticket-edit:hover { color: var(--ink); background: rgba(43,38,32,0.06); }
+  .ticket-del:hover { color: var(--red); background: rgba(178,58,46,0.08); }
+
+  .lg-empty {
+    background: var(--paper-card); border: 1px dashed var(--line); border-radius: 6px;
+    padding: 30px 20px; text-align: center; color: var(--ink-soft); font-size: 14px; margin-bottom: 18px;
+  }
+
+  .lg-add-btn {
+    display: block; width: 100%; font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+    letter-spacing: 0.04em; padding: 13px; border-radius: 4px; border: 1px solid var(--ink);
+    background: var(--ink); color: var(--paper); cursor: pointer; margin-top: 6px;
+  }
+  .lg-add-btn.secondary { background: transparent; color: var(--ink); }
+  .lg-add-btn:disabled { opacity: 0.5; cursor: default; }
+
+  .lg-form, .lg-settings {
+    background: var(--paper-card); border: 1px solid var(--line); border-radius: 6px;
+    padding: 16px; margin-top: 12px; display: none;
+  }
+  .lg-form.show, .lg-settings.show { display: block; }
+  .lg-field { margin-bottom: 12px; }
+  .lg-field label { display: block; font-size: 12px; color: var(--ink-soft); margin-bottom: 4px; }
+  .lg-field input, .lg-field select {
+    width: 100%; font-family: 'Heebo', sans-serif; font-size: 14px; padding: 9px 10px;
+    border-radius: 4px; border: 1px solid var(--line); background: #fff; color: var(--ink);
+  }
+  .lg-field-row { display: flex; gap: 10px; }
+  .lg-field-row .lg-field { flex: 1; }
+  .lg-error { color: var(--red); font-size: 12px; margin-bottom: 10px; display: none; }
+  .lg-error.show { display: block; }
+  .lg-hint { font-size: 11px; color: var(--ink-soft); margin: -6px 0 12px; line-height: 1.5; }
+  .lg-form-actions { display: flex; gap: 8px; margin-top: 4px; }
+  .lg-form-actions .lg-add-btn { margin-top: 0; }
+
+  .lg-setup {
+    background: var(--paper-card); border: 1px dashed var(--line); border-radius: 6px;
+    padding: 20px; text-align: center; color: var(--ink-soft); font-size: 13px; line-height: 1.6;
+  }
+  .lg-setup .lg-add-btn { margin-top: 14px; }
+</style>
+</head>
+<body>
+
+<div class="lg-header">
+  <div>
+    <div class="lg-eyebrow">פנקס מנויים</div>
+    <h1 class="lg-title">כל המנויים שלי, במקום אחד</h1>
+  </div>
+  <button class="lg-gear" id="gearBtn" title="הגדרות חיבור ל-GitHub">⚙</button>
+</div>
+
+<div class="lg-sync-bar" id="syncBar" style="display:none;">
+  <span class="lg-sync-dot" id="syncDot"></span>
+  <span id="syncText">מסונכרן עם GitHub</span>
+</div>
+
+<div id="setupBox" class="lg-setup" style="display:none;">
+  עדיין לא חובר ל-GitHub.<br>לחץ על ⚙ למעלה כדי להזין את פרטי הרפו והטוקן.
+</div>
+
+<div id="appBox" style="display:none;">
+  <div class="lg-totals">
+    <div class="lg-totals-row">
+      <span class="lg-totals-label">סה"כ לחודש</span>
+      <span class="lg-totals-value" id="totalMonthly">₪0</span>
+    </div>
+    <div class="lg-totals-row">
+      <span class="lg-totals-label">סה"כ לשנה</span>
+      <span class="lg-totals-value small" id="totalAnnual">₪0</span>
+    </div>
+  </div>
+
+  <div class="lg-upcoming" id="upcomingBox">
+    <div class="lg-upcoming-title">מתחדשים בחודש הקרוב — עדיין רלוונטי?</div>
+    <div id="upcomingList"></div>
+  </div>
+
+  <div class="lg-cats" id="catsBox"></div>
+
+  <div id="emptyBox" class="lg-empty" style="display:none;">
+    עדיין אין מנויים ברשימה.<br>הוסף את המנוי הראשון כדי להתחיל לעקוב אחרי ההוצאות.
+  </div>
+
+  <div id="listTitle" class="lg-list-title" style="display:none;"></div>
+  <div id="ticketList"></div>
+
+  <button class="lg-add-btn" id="addBtn">+ הוסף מנוי חדש</button>
+
+  <form class="lg-form" id="subForm">
+    <div class="lg-list-title" id="formTitle" style="margin-top:0;">מנוי חדש</div>
+    <div class="lg-error" id="formError">נא למלא את כל השדות</div>
+    <div class="lg-field">
+      <label>שם המנוי</label>
+      <input type="text" id="fName" placeholder="למשל: נטפליקס">
+    </div>
+    <div class="lg-field">
+      <label>תחום</label>
+      <select id="fCategory">
+        <option value="">בחר תחום</option>
+        <option value="תוכן ובידור">תוכן ובידור</option>
+        <option value="כלים ותוכנה">כלים ותוכנה</option>
+        <option value="כושר ובריאות">כושר ובריאות</option>
+        <option value="מזון ומשלוחים">מזון ומשלוחים</option>
+        <option value="אחר">אחר</option>
+        <option value="__custom__">תחום אחר...</option>
+      </select>
+    </div>
+    <div class="lg-field" id="customCatField" style="display:none;">
+      <label>שם התחום</label>
+      <input type="text" id="fCustomCategory" placeholder="הקלד תחום חדש">
+    </div>
+    <div class="lg-field-row">
+      <div class="lg-field">
+        <label>עלות (₪)</label>
+        <input type="number" id="fCost" placeholder="0">
+      </div>
+      <div class="lg-field">
+        <label>תדירות חיוב</label>
+        <select id="fCycle">
+          <option value="monthly">חודשי</option>
+          <option value="annual">שנתי</option>
+        </select>
+      </div>
+    </div>
+    <div class="lg-field">
+      <label>תאריך חידוש הקרוב</label>
+      <input type="date" id="fRenewalDate">
+    </div>
+    <div class="lg-form-actions">
+      <button type="submit" class="lg-add-btn" id="saveBtn">שמור מנוי</button>
+      <button type="button" class="lg-add-btn secondary" id="cancelBtn">בטל</button>
+    </div>
+  </form>
+</div>
+
+<div class="lg-settings" id="settingsBox">
+  <div class="lg-list-title" style="margin-top:0;">חיבור ל-GitHub</div>
+  <div class="lg-hint">
+    השתמש בטוקן "fine-grained" שמוגבל רק לרפו הזה, עם הרשאת Contents בלבד (Read and write).
+    צור אחד ב-Settings → Developer settings → Personal access tokens → Fine-grained tokens.
+    הטוקן נשמר רק בדפדפן הזה, במכשיר הזה.
+  </div>
+  <div class="lg-error" id="settingsError">חסרים פרטים</div>
+  <div class="lg-field">
+    <label>שם המשתמש / הארגון ב-GitHub</label>
+    <input type="text" id="sOwner" placeholder="למשל: EhudShi">
+  </div>
+  <div class="lg-field">
+    <label>שם הרפו</label>
+    <input type="text" id="sRepo" placeholder="למשל: subscription-manager">
+  </div>
+  <div class="lg-field-row">
+    <div class="lg-field">
+      <label>ענף (branch)</label>
+      <input type="text" id="sBranch" value="main">
+    </div>
+    <div class="lg-field">
+      <label>נתיב הקובץ</label>
+      <input type="text" id="sPath" value="subscriptions.json">
+    </div>
+  </div>
+  <div class="lg-field">
+    <label>Personal Access Token</label>
+    <input type="password" id="sToken" placeholder="github_pat_...">
+  </div>
+  <div class="lg-form-actions">
+    <button type="button" class="lg-add-btn" id="saveSettingsBtn">שמור והתחבר</button>
+    <button type="button" class="lg-add-btn secondary" id="cancelSettingsBtn">בטל</button>
+  </div>
+</div>
+
+<script>
+  const PRESET_CATEGORIES = ["תוכן ובידור", "כלים ותוכנה", "כושר ובריאות", "מזון ומשלוחים", "אחר"];
+  const CATEGORY_PALETTE = ["#B23A2E", "#2F5233", "#3D5A73", "#8B5E34", "#6B4C7A", "#A6873E", "#4A5240"];
+  const SETTINGS_KEY = "ledger_gh_settings_v1";
+  const DISMISSED_KEY = "ledger_dismissed_v1";
+
+  let subs = [];
+  let currentSha = null;
+  let editingId = null;
+  let dismissed = {};
+  let settings = null;
+  let saving = false;
+
+  // ---------- utils ----------
+  function utf8ToBase64(str) { return btoa(unescape(encodeURIComponent(str))); }
+  function base64ToUtf8(str) { return decodeURIComponent(escape(atob(str.replace(/\n/g, "")))); }
+
+  function parseDate(s) { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); }
+
+  function nextRenewal(dateStr, cycle) {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    let d = parseDate(dateStr);
+    if (isNaN(d.getTime())) return null;
+    let guard = 0;
+    while (d < today && guard < 600) {
+      if (cycle === "monthly") d.setMonth(d.getMonth() + 1);
+      else d.setFullYear(d.getFullYear() + 1);
+      guard++;
+    }
+    return d;
+  }
+  function daysBetween(a, b) {
+    const aa = new Date(a); aa.setHours(0,0,0,0);
+    const bb = new Date(b); bb.setHours(0,0,0,0);
+    return Math.round((aa - bb) / 86400000);
+  }
+  function fmtILS(n) { return "₪" + Math.round(n).toLocaleString("he-IL"); }
+  function fmtDate(d) { return d.toLocaleDateString("he-IL", { day: "numeric", month: "short", year: "numeric" }); }
+  function catColor(category, order) {
+    const idx = order.indexOf(category);
+    return CATEGORY_PALETTE[(idx >= 0 ? idx : 0) % CATEGORY_PALETTE.length];
+  }
+  function getCategoryOrder() {
+    const seen = [];
+    subs.forEach(s => { if (!seen.includes(s.category)) seen.push(s.category); });
+    return seen;
+  }
+  function getEnriched() {
+    return subs.map(s => {
+      const nr = nextRenewal(s.renewalDate, s.cycle);
+      const days = nr ? daysBetween(nr, new Date()) : null;
+      const monthlyCost = s.cycle === "monthly" ? s.cost : s.cost / 12;
+      const annualCost = s.cycle === "annual" ? s.cost : s.cost * 12;
+      return Object.assign({}, s, { nextRenewalDate: nr, daysUntil: days, monthlyCost, annualCost });
+    }).sort((a, b) => (a.daysUntil ?? 9999) - (b.daysUntil ?? 9999));
+  }
+
+  // ---------- settings ----------
+  function loadSettings() {
+    try { const raw = localStorage.getItem(SETTINGS_KEY); if (raw) return JSON.parse(raw); } catch (e) {}
+    return null;
+  }
+  function saveSettingsToStorage(s) { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
+  function loadDismissed() {
+    try { const raw = localStorage.getItem(DISMISSED_KEY); if (raw) return JSON.parse(raw); } catch (e) {}
+    return {};
+  }
+  function saveDismissed(map) {
+    dismissed = map;
+    try { localStorage.setItem(DISMISSED_KEY, JSON.stringify(map)); } catch (e) {}
+  }
+
+  // ---------- GitHub API ----------
+  function ghUrl() {
+    return `https://api.github.com/repos/${settings.owner}/${settings.repo}/contents/${encodeURIComponent(settings.path)}`;
+  }
+
+  async function ghLoad() {
+    setSync("busy", "טוען מ-GitHub...");
+    const res = await fetch(`${ghUrl()}?ref=${encodeURIComponent(settings.branch)}`, {
+      headers: { Authorization: `Bearer ${settings.token}`, Accept: "application/vnd.github+json" }
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.message || `שגיאה ${res.status}`);
+    }
+    const data = await res.json();
+    currentSha = data.sha;
+    subs = JSON.parse(base64ToUtf8(data.content));
+    setSync("ok", "מסונכרן עם GitHub");
+  }
+
+  async function ghSave(commitMessage) {
+    saving = true;
+    setSync("busy", "שומר ל-GitHub...");
+    const body = {
+      message: commitMessage,
+      content: utf8ToBase64(JSON.stringify(subs, null, 2)),
+      sha: currentSha,
+      branch: settings.branch
+    };
+    const res = await fetch(ghUrl(), {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${settings.token}`,
+        Accept: "application/vnd.github+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
+    saving = false;
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      setSync("err", "שמירה נכשלה: " + (errBody.message || res.status));
+      throw new Error(errBody.message || String(res.status));
+    }
+    const data = await res.json();
+    currentSha = data.content.sha;
+    setSync("ok", "מסונכרן עם GitHub");
+  }
+
+  function setSync(state, text) {
+    document.getElementById("syncBar").style.display = "flex";
+    const dot = document.getElementById("syncDot");
+    dot.className = "lg-sync-dot" + (state === "err" ? " err" : state === "busy" ? " busy" : "");
+    document.getElementById("syncText").textContent = text;
+  }
+
+  // ---------- render ----------
+  function render() {
+    const enriched = getEnriched();
+    const order = getCategoryOrder();
+
+    const totalMonthly = enriched.reduce((sum, s) => sum + s.monthlyCost, 0);
+    const totalAnnual = enriched.reduce((sum, s) => sum + s.annualCost, 0);
+    document.getElementById("totalMonthly").textContent = fmtILS(totalMonthly);
+    document.getElementById("totalAnnual").textContent = fmtILS(totalAnnual);
+
+    const upcoming = enriched.filter(s => s.daysUntil !== null && s.daysUntil <= 30 && s.daysUntil >= 0 && !dismissed[s.id]);
+    const upcomingBox = document.getElementById("upcomingBox");
+    const upcomingList = document.getElementById("upcomingList");
+    upcomingList.innerHTML = "";
+    if (upcoming.length > 0) {
+      upcomingBox.classList.add("show");
+      upcoming.forEach(s => {
+        const row = document.createElement("div");
+        row.className = "lg-upcoming-item";
+        row.innerHTML = `
+          <div>
+            <div class="lg-upcoming-name"></div>
+            <div class="lg-upcoming-sub"></div>
+          </div>
+          <div class="lg-upcoming-actions">
+            <button class="lg-btn-tiny yes">עדיין כן</button>
+            <button class="lg-btn-tiny no">לבטל</button>
+          </div>`;
+        row.querySelector(".lg-upcoming-name").textContent = s.name;
+        row.querySelector(".lg-upcoming-sub").textContent = `מתחדש בעוד ${s.daysUntil} ימים · ${fmtDate(s.nextRenewalDate)}`;
+        row.querySelector(".yes").addEventListener("click", () => {
+          saveDismissed(Object.assign({}, dismissed, { [s.id]: true }));
+          render();
+        });
+        row.querySelector(".no").addEventListener("click", () => deleteSub(s.id));
+        upcomingList.appendChild(row);
+      });
+    } else {
+      upcomingBox.classList.remove("show");
+    }
+
+    const catTotalsMap = {};
+    enriched.forEach(s => { catTotalsMap[s.category] = (catTotalsMap[s.category] || 0) + s.monthlyCost; });
+    const catTotals = Object.entries(catTotalsMap).sort((a, b) => b[1] - a[1]);
+    const catsBox = document.getElementById("catsBox");
+    catsBox.innerHTML = "";
+    catTotals.forEach(([cat, amount]) => {
+      const chip = document.createElement("div");
+      chip.className = "lg-cat-chip";
+      chip.innerHTML = `<span class="lg-cat-dot" style="background:${catColor(cat, order)}"></span>${cat}<span class="lg-cat-amount">${fmtILS(amount)}/ח'</span>`;
+      catsBox.appendChild(chip);
+    });
+
+    const emptyBox = document.getElementById("emptyBox");
+    const listTitle = document.getElementById("listTitle");
+    const ticketList = document.getElementById("ticketList");
+    ticketList.innerHTML = "";
+
+    if (enriched.length === 0) {
+      emptyBox.style.display = "block";
+      listTitle.style.display = "none";
+    } else {
+      emptyBox.style.display = "none";
+      listTitle.style.display = "block";
+      listTitle.textContent = `כל המנויים (${enriched.length})`;
+      enriched.forEach(s => {
+        const soon = s.daysUntil !== null && s.daysUntil <= 30 && s.daysUntil >= 0;
+        const ticket = document.createElement("div");
+        ticket.className = "ticket";
+        ticket.innerHTML = `
+          <div class="ticket-actions">
+            <button class="ticket-del" aria-label="מחק מנוי">✕</button>
+            <button class="ticket-edit" aria-label="ערוך מנוי">✎</button>
+          </div>
+          <div class="ticket-main">
+            <div class="ticket-name"></div>
+            <div class="ticket-meta">
+              <span class="ticket-stamp"></span>
+              <span class="ticket-renew"></span>
+            </div>
+          </div>
+          <div class="ticket-divider"></div>
+          <div class="ticket-side">
+            <div class="ticket-price"></div>
+            <div class="ticket-cycle"></div>
+            <div class="ticket-days"></div>
+          </div>`;
+        ticket.querySelector(".ticket-name").textContent = s.name;
+        const stamp = ticket.querySelector(".ticket-stamp");
+        stamp.textContent = s.category;
+        stamp.style.background = catColor(s.category, order);
+        ticket.querySelector(".ticket-renew").textContent = "מתחדש " + fmtDate(s.nextRenewalDate);
+        ticket.querySelector(".ticket-price").textContent = fmtILS(s.cost);
+        ticket.querySelector(".ticket-cycle").textContent = s.cycle === "monthly" ? "לחודש" : "לשנה";
+        const daysEl = ticket.querySelector(".ticket-days");
+        daysEl.textContent = s.daysUntil >= 0 ? `בעוד ${s.daysUntil} ימים` : "עבר התאריך";
+        if (soon) daysEl.classList.add("soon");
+
+        ticket.querySelector(".ticket-edit").addEventListener("click", () => startEdit(s));
+        ticket.querySelector(".ticket-del").addEventListener("click", () => deleteSub(s.id));
+        ticketList.appendChild(ticket);
+      });
+    }
+    refreshCategoryOptions(order);
+  }
+
+  function refreshCategoryOptions(order) {
+    const select = document.getElementById("fCategory");
+    const current = select.value;
+    const extra = order.filter(c => !PRESET_CATEGORIES.includes(c));
+    Array.from(select.querySelectorAll("option[data-extra]")).forEach(o => o.remove());
+    const customOpt = select.querySelector('option[value="__custom__"]');
+    extra.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c; opt.textContent = c; opt.setAttribute("data-extra", "1");
+      select.insertBefore(opt, customOpt);
+    });
+    select.value = current;
+  }
+
+  // ---------- mutations (all go through GitHub) ----------
+  async function deleteSub(id) {
+    const prev = subs;
+    subs = subs.filter(s => s.id !== id);
+    try {
+      await ghSave(`מחיקת מנוי (${id})`);
+      if (editingId === id) { resetForm(); hideForm(); }
+      render();
+    } catch (e) {
+      subs = prev; // revert on failure
+      alert("מחיקה נכשלה: " + e.message);
+      render();
+    }
+  }
+
+  function resetForm() {
+    document.getElementById("fName").value = "";
+    document.getElementById("fCategory").value = "";
+    document.getElementById("fCustomCategory").value = "";
+    document.getElementById("fCost").value = "";
+    document.getElementById("fCycle").value = "monthly";
+    document.getElementById("fRenewalDate").value = "";
+    document.getElementById("customCatField").style.display = "none";
+    document.getElementById("formError").classList.remove("show");
+    editingId = null;
+    document.getElementById("formTitle").textContent = "מנוי חדש";
+    document.getElementById("saveBtn").textContent = "שמור מנוי";
+  }
+
+  function startEdit(s) {
+    const isPreset = PRESET_CATEGORIES.includes(s.category);
+    document.getElementById("fName").value = s.name;
+    document.getElementById("fCategory").value = isPreset ? s.category : "__custom__";
+    document.getElementById("fCustomCategory").value = isPreset ? "" : s.category;
+    document.getElementById("customCatField").style.display = isPreset ? "none" : "block";
+    document.getElementById("fCost").value = s.cost;
+    document.getElementById("fCycle").value = s.cycle;
+    document.getElementById("fRenewalDate").value = s.renewalDate;
+    editingId = s.id;
+    document.getElementById("formTitle").textContent = "עריכת מנוי";
+    document.getElementById("saveBtn").textContent = "עדכן מנוי";
+    document.getElementById("formError").classList.remove("show");
+    showForm();
+  }
+
+  function showForm() { document.getElementById("subForm").classList.add("show"); document.getElementById("addBtn").style.display = "none"; }
+  function hideForm() { document.getElementById("subForm").classList.remove("show"); document.getElementById("addBtn").style.display = "block"; }
+
+  document.getElementById("addBtn").addEventListener("click", () => { resetForm(); showForm(); });
+  document.getElementById("cancelBtn").addEventListener("click", () => { resetForm(); hideForm(); });
+  document.getElementById("fCategory").addEventListener("change", (e) => {
+    document.getElementById("customCatField").style.display = e.target.value === "__custom__" ? "block" : "none";
+  });
+
+  document.getElementById("subForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (saving) return;
+    const catSelect = document.getElementById("fCategory").value;
+    const category = catSelect === "__custom__" ? document.getElementById("fCustomCategory").value.trim() : catSelect;
+    const name = document.getElementById("fName").value.trim();
+    const cost = parseFloat(document.getElementById("fCost").value);
+    const cycle = document.getElementById("fCycle").value;
+    const renewalDate = document.getElementById("fRenewalDate").value;
+
+    if (!name || !category || !cost || !renewalDate) {
+      document.getElementById("formError").classList.add("show");
+      return;
+    }
+    document.getElementById("formError").classList.remove("show");
+
+    const prev = subs;
+    let commitMsg;
+    if (editingId) {
+      subs = subs.map(s => s.id === editingId ? Object.assign({}, s, { name, category, cost, cycle, renewalDate }) : s);
+      commitMsg = `עדכון מנוי: ${name}`;
+    } else {
+      subs = subs.concat([{ id: Date.now().toString(), name, category, cost, cycle, renewalDate }]);
+      commitMsg = `הוספת מנוי: ${name}`;
+    }
+    document.getElementById("saveBtn").disabled = true;
+    try {
+      await ghSave(commitMsg);
+      resetForm();
+      hideForm();
+      render();
+    } catch (err) {
+      subs = prev;
+      document.getElementById("formError").textContent = "שמירה נכשלה: " + err.message;
+      document.getElementById("formError").classList.add("show");
+    } finally {
+      document.getElementById("saveBtn").disabled = false;
+    }
+  });
+
+  // ---------- settings UI ----------
+  function openSettings() {
+    if (settings) {
+      document.getElementById("sOwner").value = settings.owner;
+      document.getElementById("sRepo").value = settings.repo;
+      document.getElementById("sBranch").value = settings.branch;
+      document.getElementById("sPath").value = settings.path;
+      document.getElementById("sToken").value = settings.token;
+    }
+    document.getElementById("settingsBox").classList.add("show");
+    document.getElementById("settingsError").classList.remove("show");
+  }
+  function closeSettings() { document.getElementById("settingsBox").classList.remove("show"); }
+
+  document.getElementById("gearBtn").addEventListener("click", openSettings);
+  document.getElementById("cancelSettingsBtn").addEventListener("click", closeSettings);
+
+  document.getElementById("saveSettingsBtn").addEventListener("click", async () => {
+    const owner = document.getElementById("sOwner").value.trim();
+    const repo = document.getElementById("sRepo").value.trim();
+    const branch = document.getElementById("sBranch").value.trim() || "main";
+    const path = document.getElementById("sPath").value.trim() || "subscriptions.json";
+    const token = document.getElementById("sToken").value.trim();
+    if (!owner || !repo || !token) {
+      document.getElementById("settingsError").textContent = "נא למלא שם משתמש, רפו וטוקן";
+      document.getElementById("settingsError").classList.add("show");
+      return;
+    }
+    settings = { owner, repo, branch, path, token };
+    saveSettingsToStorage(settings);
+    closeSettings();
+    await bootFromGitHub();
+  });
+
+  // ---------- boot ----------
+  async function bootFromGitHub() {
+    document.getElementById("setupBox").style.display = "none";
+    try {
+      await ghLoad();
+      document.getElementById("appBox").style.display = "block";
+      render();
+    } catch (e) {
+      document.getElementById("setupBox").style.display = "block";
+      document.getElementById("setupBox").textContent = "החיבור נכשל: " + e.message + " — לחץ על ⚙ כדי לבדוק את הפרטים.";
+      document.getElementById("appBox").style.display = "none";
+    }
+  }
+
+  (function init() {
+    dismissed = loadDismissed();
+    settings = loadSettings();
+    if (settings) {
+      bootFromGitHub();
+    } else {
+      document.getElementById("setupBox").style.display = "block";
+    }
+  })();
+</script>
+</body>
+</html>
