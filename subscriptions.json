@@ -1,11 +1,74 @@
 [
-  { "id": "seed-1", "name": "Google One 200GB", "category": "כלים ותוכנה", "cost": 120, "cycle": "annual", "renewalDate": "2026-08-10" },
-  { "id": "seed-2", "name": "Netflix", "category": "תוכן ובידור", "cost": 420, "cycle": "annual", "renewalDate": "2026-08-13" },
-  { "id": "seed-3", "name": "Disney+", "category": "תוכן ובידור", "cost": 300, "cycle": "annual", "renewalDate": "2026-08-10" },
-  { "id": "seed-4", "name": "Apple Drive", "category": "כלים ותוכנה", "cost": 11.9, "cycle": "monthly", "renewalDate": "2026-08-10" },
-  { "id": "seed-5", "name": "Spotify", "category": "תוכן ובידור", "cost": 406.8, "cycle": "annual", "renewalDate": "2026-08-10" },
-  { "id": "seed-6", "name": "RiseUp", "category": "כלים ותוכנה", "cost": 430, "cycle": "annual", "renewalDate": "2026-08-10" },
-  { "id": "seed-7", "name": "Wolt+", "category": "מזון ומשלוחים", "cost": 600, "cycle": "annual", "renewalDate": "2026-08-10" },
-  { "id": "seed-8", "name": "ChatGPT Plus", "category": "כלים ותוכנה", "cost": 70, "cycle": "monthly", "renewalDate": "2026-08-10" },
-  { "id": "seed-9", "name": "Replit Core", "category": "כלים ותוכנה", "cost": 70, "cycle": "monthly", "renewalDate": "2026-08-10" }
+  {
+    "id": "seed-1",
+    "name": "Google One 200GB",
+    "category": "כלים ותוכנה",
+    "cost": 120,
+    "cycle": "annual",
+    "renewalDate": "2026-08-10"
+  },
+  {
+    "id": "seed-2",
+    "name": "Netflix",
+    "category": "תוכן ובידור",
+    "cost": 420,
+    "cycle": "annual",
+    "renewalDate": "2026-08-13"
+  },
+  {
+    "id": "seed-3",
+    "name": "Disney+",
+    "category": "תוכן ובידור",
+    "cost": 300,
+    "cycle": "annual",
+    "renewalDate": "2026-08-10"
+  },
+  {
+    "id": "seed-4",
+    "name": "Apple Drive",
+    "category": "כלים ותוכנה",
+    "cost": 12,
+    "cycle": "monthly",
+    "renewalDate": "2026-08-13"
+  },
+  {
+    "id": "seed-5",
+    "name": "Spotify",
+    "category": "תוכן ובידור",
+    "cost": 406.8,
+    "cycle": "annual",
+    "renewalDate": "2026-08-10"
+  },
+  {
+    "id": "seed-6",
+    "name": "RiseUp",
+    "category": "כלים ותוכנה",
+    "cost": 430,
+    "cycle": "annual",
+    "renewalDate": "2026-08-10"
+  },
+  {
+    "id": "seed-7",
+    "name": "Wolt+",
+    "category": "מזון ומשלוחים",
+    "cost": 600,
+    "cycle": "annual",
+    "renewalDate": "2026-08-10"
+  },
+  {
+    "id": "seed-8",
+    "name": "ChatGPT Plus",
+    "category": "כלים ותוכנה",
+    "cost": 70,
+    "cycle": "monthly",
+    "renewalDate": "2026-08-10"
+  },
+  {
+    "id": "seed-9",
+    "name": "Replit Core",
+    "category": "כלים ותוכנה",
+    "cost": 70,
+    "cycle": "monthly",
+    "renewalDate": "2026-08-10"
+  }
 ]
