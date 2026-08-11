@@ -1,6 +1,9 @@
 name: Subscription Renewal Check
 
 on:
+  push:
+    paths:
+      - 'subscriptions.json'   # runs immediately whenever the app commits a change
   schedule:
     - cron: '0 6 * * *'  # 06:00 UTC ≈ 08:00-09:00 Israel time (adjust if you want a different hour)
   workflow_dispatch: {}   # lets you trigger it manually from the Actions tab to test
