@@ -64,14 +64,6 @@
     "renewalDate": "2026-09-12"
   },
   {
-    "id": "seed-9",
-    "name": "Replit Core",
-    "category": "כלים ותוכנה",
-    "cost": 70,
-    "cycle": "monthly",
-    "renewalDate": "2026-08-24"
-  },
-  {
     "id": "1787650228392",
     "name": "Claude Code",
     "category": "כלים ותוכנה",
